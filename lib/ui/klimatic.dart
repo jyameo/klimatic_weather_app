@@ -11,6 +11,13 @@ class Klimatic extends StatefulWidget {
 }
 
 class _KlimaticState extends State<Klimatic> {
+  Future _goToNextScreen(BuildContext context) async {
+    Map results = await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) {
+      return new ChangeCity();
+    }));
+  }
+
   void showStuff() async {
     Map data = await getWeather(util.appId, util.defaultCity);
     print(data.toString());
@@ -24,7 +31,8 @@ class _KlimaticState extends State<Klimatic> {
         centerTitle: true,
         backgroundColor: Colors.redAccent,
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.menu), onPressed: showStuff)
+          IconButton(
+              icon: Icon(Icons.menu), onPressed: () => _goToNextScreen(context))
         ],
       ),
       body: Stack(
@@ -41,7 +49,7 @@ class _KlimaticState extends State<Klimatic> {
             alignment: Alignment.topRight,
             margin: const EdgeInsets.fromLTRB(0.0, 10.9, 20.9, 0.0),
             child: Text(
-              "Spokane",
+              util.defaultCity,
               style: cityStyle(),
             ),
           ),
@@ -90,6 +98,27 @@ class _KlimaticState extends State<Klimatic> {
             return Container();
           }
         });
+  }
+}
+
+class ChangeCity extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.red,
+        title: Text('Change City'),
+        centerTitle: true,
+      ),
+      body: Stack(
+        children: <Widget>[
+          Center(
+            child: Image.asset('images/white_snow.png',
+                width: 490.0, height: 1200.0, fit: BoxFit.fill),
+          ),
+        ],
+      ),
+    );
   }
 }
 
