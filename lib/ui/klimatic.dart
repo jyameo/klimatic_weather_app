@@ -11,11 +11,17 @@ class Klimatic extends StatefulWidget {
 }
 
 class _KlimaticState extends State<Klimatic> {
+  String _cityEntered = util.defaultCity;
+
   Future _goToNextScreen(BuildContext context) async {
     Map results = await Navigator.of(context)
-        .push(MaterialPageRoute(builder: (BuildContext context) {
+        .push(MaterialPageRoute<Map>(builder: (BuildContext context) {
       return new ChangeCity();
     }));
+    _cityEntered = results['enter'];
+//    if (results != null && results.containsKey('enter')) {
+//      _cityEntered = results['enter'];
+//    }
   }
 
   void showStuff() async {
@@ -49,7 +55,7 @@ class _KlimaticState extends State<Klimatic> {
             alignment: Alignment.topRight,
             margin: const EdgeInsets.fromLTRB(0.0, 10.9, 20.9, 0.0),
             child: Text(
-              util.defaultCity,
+              '${_cityEntered == null ? util.defaultCity : _cityEntered}',
               style: cityStyle(),
             ),
           ),
@@ -58,9 +64,9 @@ class _KlimaticState extends State<Klimatic> {
             child: Image.asset("images/light_rain.png"),
           ),
           Container(
-            margin: const EdgeInsets.fromLTRB(30.0, 290.0, 0.0, 0.0),
+            margin: const EdgeInsets.fromLTRB(100.0, 350.0, 0.0, 0.0),
             alignment: Alignment.center,
-            child: updateTempWidget("Montreal"),
+            child: updateTempWidget(_cityEntered),
           ),
         ],
       ),
@@ -69,8 +75,8 @@ class _KlimaticState extends State<Klimatic> {
 
   Future<Map> getWeather(String appId, String city) async {
     String apiUrl = "http://api.openweathermap.org/data/2.5/weather"
-        "?q=${util.defaultCity}"
-        "&APPID=${util.appId}&units=metric";
+        "?q=${city}"
+        "&APPID=${appId}&units=metric";
 
     http.Response response = await http.get(apiUrl);
 
@@ -79,7 +85,7 @@ class _KlimaticState extends State<Klimatic> {
 
   Widget updateTempWidget(String city) {
     return FutureBuilder(
-        future: getWeather(util.appId, city),
+        future: getWeather(util.appId, city == null ? util.defaultCity : city),
         builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
           // get all the json data
           if (snapshot.hasData) {
@@ -102,6 +108,7 @@ class _KlimaticState extends State<Klimatic> {
 }
 
 class ChangeCity extends StatelessWidget {
+  final _cityFieldController = new TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,6 +123,27 @@ class ChangeCity extends StatelessWidget {
             child: Image.asset('images/white_snow.png',
                 width: 490.0, height: 1200.0, fit: BoxFit.fill),
           ),
+          ListView(
+            children: <Widget>[
+              ListTile(
+                  title: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Enter City',
+                ),
+                controller: _cityFieldController,
+                keyboardType: TextInputType.text,
+              )),
+              ListTile(
+                title: FlatButton(
+                    onPressed: () => Navigator.pop(context, {
+                          'enter': _cityFieldController.text,
+                        }),
+                    textColor: Colors.white70,
+                    color: Colors.redAccent,
+                    child: Text('Get Weather')),
+              )
+            ],
+          )
         ],
       ),
     );
