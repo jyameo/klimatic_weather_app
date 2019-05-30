@@ -11,7 +11,7 @@ class Klimatic extends StatefulWidget {
 }
 
 class _KlimaticState extends State<Klimatic> {
-  String _cityEntered = util.defaultCity;
+  String _cityEntered;
 
   Future _goToNextScreen(BuildContext context) async {
     Map results = await Navigator.of(context)
@@ -60,14 +60,15 @@ class _KlimaticState extends State<Klimatic> {
             ),
           ),
           Container(
-            alignment: Alignment.center,
+            alignment: Alignment.topRight,
+            margin: const EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 0.0),
             child: Image.asset("images/light_rain.png"),
           ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(100.0, 350.0, 0.0, 0.0),
-            alignment: Alignment.center,
-            child: updateTempWidget(_cityEntered),
-          ),
+          updateTempWidget(_cityEntered),
+//          Container(
+//            alignment: Alignment.center,
+//            child: updateTempWidget(_cityEntered),
+//          ),
         ],
       ),
     );
@@ -91,15 +92,25 @@ class _KlimaticState extends State<Klimatic> {
           if (snapshot.hasData) {
             Map content = snapshot.data;
             return Container(
+                margin: const EdgeInsets.fromLTRB(100.0, 250.0, 0.0, 0.0),
                 child: Column(
-              children: <Widget>[
-                ListTile(
-                    title: Text(
-                  content['main']['temp'].toString(),
-                  style: tempStyle(),
-                ))
-              ],
-            ));
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    ListTile(
+                        title: Text(
+                          content['main']['temp'].toString() + " C°",
+                          style: degreeStyle(),
+                        ),
+                        subtitle: ListTile(
+                          title: Text(
+                            'Humidity: ${content['main']['humidity'].toString()}\n'
+                                'Min: ${content['main']['temp_min'].toString()}\n'
+                                'Max: ${content['main']['temp_max'].toString()}',
+                            style: extraDataStyle(),
+                          ),
+                        )),
+                  ],
+                ));
           } else {
             return Container();
           }
@@ -158,11 +169,19 @@ TextStyle cityStyle() {
   );
 }
 
-TextStyle tempStyle() {
+TextStyle degreeStyle() {
   return TextStyle(
     color: Colors.white,
     fontSize: 49.9,
     fontStyle: FontStyle.normal,
     fontWeight: FontWeight.w500,
+  );
+}
+
+TextStyle extraDataStyle() {
+  return TextStyle(
+    color: Colors.white70,
+    fontSize: 17.0,
+    fontStyle: FontStyle.normal,
   );
 }
